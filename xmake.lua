@@ -4,7 +4,7 @@ set_languages("cxx26")
 includes("deps/blook.lua")
 add_requires("blook 79f84d4908290d86761cc28fe36bcf35c6115984", "cpptrace")
 
-target("launch29")
+target("launcher")
     set_kind("binary")
     set_encodings("utf-8")
     -- add_ldflags("-subsystem:windows")
