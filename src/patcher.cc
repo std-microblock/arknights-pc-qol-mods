@@ -32,16 +32,14 @@ static void patch_hgsdk(DWORD dwProcessId) {
     auto disasm = fn_getDeviceModel.value().range_size(100).disassembly();
     auto res = std::ranges::find_if(
         disasm, [&](const blook::disasm::InstructionCtx &instr) {
-          using namespace zasm;
-          return instr->getMnemonic() == x86::Mnemonic::Lea &&
-                 instr->getOperandCount() == 2 &&
-                 instr->getOperand(1).holds<zasm::x86::Mem>();
+          auto xrefs = instr.xrefs();
+          return xrefs.size() == 1 && xrefs[0].try_read_s8().value_or(0) == '2';
         });
 
     if (res == disasm.end())
       throw std::runtime_error("Lea instruction not found");
 
-    std::println("[hgsdk] Found at {}", (*res).ptr().data());
+    std::println("[hgsdk] Found at {}", ((*res).ptr() - sdk->base()).data());
     auto ref = (*res).xrefs()[0];
     ref.write_s8('1');
     std::println("[hgsdk] Bypassed hgsdk platform");
