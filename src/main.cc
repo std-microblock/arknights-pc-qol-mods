@@ -5,28 +5,34 @@
 #include <thread>
 
 int main() {
-    patcher::ProcessInfo info = patcher::launch_and_patch();
-    if (!info.hProcess) {
-        std::cerr << "Failed to launch or patch!" << std::endl;
-        return 1;
-    }
+  try {
+    patcher::launch_and_patch();
+  } catch (const std::exception &e) {
+    std::cerr << "Error: " << e.what() << std::endl;
 
-    std::thread macro_thread([]() {
-        macro::start_mouse_hook();
-    });
+    wchar_t errorMessage[512];
+    const auto s = std::string("Error: ") + e.what();
+    MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, errorMessage, 512);
+    MessageBoxW(NULL, errorMessage, L"Error", MB_ICONERROR | MB_OK);
+    return 1;
+  }
 
-    WaitForSingleObject(info.hProcess, INFINITE);
-    
-    macro::stop_mouse_hook();
-    if (macro_thread.joinable()) {
-        macro_thread.join();
-    }
-    CloseHandle(info.hProcess);
+  // std::thread macro_thread([]() {
+  //     macro::start_mouse_hook();
+  // });
 
-    return 0;
+  // WaitForSingleObject(info.hProcess, INFINITE);
+
+  // macro::stop_mouse_hook();
+  // if (macro_thread.joinable()) {
+  //     macro_thread.join();
+  // }
+  // CloseHandle(info.hProcess);
+
+  return 0;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int nCmdShow) {
-    return main();
+  return main();
 }

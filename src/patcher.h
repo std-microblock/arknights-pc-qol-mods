@@ -3,11 +3,7 @@
 
 namespace patcher {
 
-struct ProcessInfo {
-    HANDLE hProcess;
-    DWORD dwProcessId;
-};
 
-ProcessInfo launch_and_patch();
+void launch_and_patch();
 
 } // namespace patcher
